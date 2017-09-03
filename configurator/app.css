@@ -1,0 +1,89 @@
+body {
+    height: 100%;
+    width: 100%;
+    margin: 0;
+}
+#svg {
+    position: absolute;
+    left: 100px;
+    top: 20px;
+    width: calc(100% - 122px);
+    height: calc(100% - 42px);
+    border: 1px solid #444;
+    cursor: crosshair;
+    /* disable text selection on svg */
+    -webkit-touch-callout: none; /* iOS Safari */
+    -webkit-user-select: none; /* Chrome/Safari/Opera */
+    -khtml-user-select: none; /* Konqueror */
+    -moz-user-select: none; /* Firefox */
+    -ms-user-select: none; /* Internet Explorer/Edge */
+    user-select: none; /* Non-prefixed version, currently not supported by any browser */
+}
+div.control {
+    position: absolute;
+    left: 20px;
+    top: 20px;
+    width: 60px;
+    height: auto;
+/*    border: 1px solid #444;
+    cursor: crosshair;*/
+    /* disable text selection on svg */
+    -webkit-touch-callout: none; /* iOS Safari */
+    -webkit-user-select: none; /* Chrome/Safari/Opera */
+    -khtml-user-select: none; /* Konqueror */
+    -moz-user-select: none; /* Firefox */
+    -ms-user-select: none; /* Internet Explorer/Edge */
+    user-select: none; /* Non-prefixed version, currently not supported by any browser */
+}
+
+.control_btn {
+    margin: 10px;
+    cursor: pointer;
+} 
+
+foreignObject {
+    background: #3F5262;
+}
+.nodeContent {
+    padding: 8px;
+}
+select {
+    width: 100%;
+}
+/* The Modal (background) */
+.modal-wrapper {
+    position: fixed; /* Stay in place */
+    z-index: 1; /* Sit on top */
+    left: 0;
+    top: 0;
+    width: 100%; /* Full width */
+    height: 100%; /* Full height */
+    overflow: auto; /* Enable scroll if needed */
+    background-color: rgb(0,0,0); /* Fallback color */
+    background-color: rgba(0,0,0,0.4); /* Black w/ opacity */
+}
+
+/* Modal Content/Box */
+.dialog {
+    background-color: #fefefe;
+    margin: 15% auto; /* 15% from the top and centered */
+    padding: 20px;
+    border: 1px solid #888;
+}
+.node-create-dialog {
+    width: 25%; /* Could be more or less, depending on screen size */
+    height: 30%; /* Could be more or less, depending on screen size */
+}
+.node-properties-dialog {
+    margin: 10px auto; /* 5% from the top and centered */
+    width: 40%;
+    height: 80%;
+    overflow-y: auto;
+    overflow-x: hidden;
+}
+.right {
+    text-align: right;
+}
+.left {
+    text-align: left;
+}

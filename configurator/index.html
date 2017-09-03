@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Пример страницы</title>
+    <script type="text/javascript" src="scriptjava.js"></script>
+    <script type="text/javascript" src="ned.js"></script>
+    <script type="text/javascript" src="app.js"></script>
+    <link rel="stylesheet" type="text/css" href="ned.css">
+    <link rel="stylesheet" type="text/css" href="app.css">
+</head>
+<body>
+    <div class="control">
+        <button id="add_node" class="control_btn">Add node</button>
+        <button id="del_node" class="control_btn">Del node(s)</button>
+    </div>
+
+    <script type="text/template" id="tpl-node-create-dialog">
+        <div class="dialog node-create-dialog">
+            Node name:&nbsp;<input type="text" id="node-name" value="" autofocus><br>
+            Node title:&nbsp;<input type="text" id="node-title" value=""><br>
+            <button id="create_node" class="control_btn">Create</button>
+        </div>
+    </script>
+
+    <script type="text/template" id="tpl-node-properties-dialog"></script>
+    <script type="text/template" id="tpl-node-pair-dialog"></script>
+
+    <svg id="svg" oncontextmenu="return false;"></svg>
+
+    <script type="text/javascript">
+        $$r(function() {
+            RuleEngine.start();
+        });
+    </script>
+</body>
+</html>
