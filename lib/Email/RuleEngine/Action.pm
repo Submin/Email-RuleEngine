@@ -10,9 +10,8 @@ use vars qw($VERSION);
 
 # VERSION
 
-use Email::RuleEngine::Base qw( update_chain internal_header_set );
+use Email::RuleEngine::Base qw( update_chain internal_header_set create );
 
-use Class::Load qw( load_class );
 use Carp qw( croak );
 
 use Exporter 'import';
@@ -24,12 +23,7 @@ sub action {
 
     croak "Undefined action type" unless $rule->{action}->{type};
 
-    my $class = 'Email::RuleEngine::Action::'.ucfirst lc $rule->{action}->{type};
-
-    load_class $class;
-
-    my $action = $class->new();
-    $action->run( $rule );
+    create( $rule->{action}->{type},  $rule )->run( $rule );
 
     my $next_node = $rule->{child_id} // '';
 

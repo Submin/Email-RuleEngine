@@ -11,8 +11,9 @@ use vars qw($VERSION);
 
 # VERSION
 
+use Email::RuleEngine::Base qw( create );
+
 use Carp qw( croak );
-use Class::Load qw( load_class );
 
 use Exporter 'import';
 
@@ -37,12 +38,7 @@ sub build {
 
     croak "Undefined condition type" unless $thing->{type};
 
-    my $class = 'Email::RuleEngine::Condition::'.ucfirst lc $thing->{type};
-
-    load_class $class;
-
-    my $condition = $class->new();
-    return $condition->run( $thing->{op}, @expr );
+    return create( $thing->{type},  $thing )->run( $thing->{op}, @expr );
 }
 
 1;

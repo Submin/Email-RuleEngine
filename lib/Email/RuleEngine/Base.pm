@@ -10,6 +10,7 @@ use vars qw($VERSION);
 
 # VERSION
 
+use Class::Load qw( load_class );
 use Carp qw( croak );
 use Try::Tiny;
 use Email::Simple;
@@ -31,6 +32,7 @@ Readonly my $AUTOFINISH_RULE => {
 
 Readonly my $MAX_RECURSION_DEPTH => 1_000;
 Readonly my $INT_HEADER_PREFIX   => 'X-OTRS-EmailFilter-Engine-';
+Readonly my $MOD_NAMESPACE       => 'Email::RuleEngine';
 
 Readonly my @NODE_FIELDS         => qw( id name parent rules );
 Readonly my @RULE_FIELDS         => qw( expression action child_id );
@@ -50,6 +52,7 @@ our @EXPORT_OK = qw(
     set_node
     get_node
     check
+    create
 );
 
 our ( $object, @nodes );
@@ -189,6 +192,28 @@ sub update_chain {
 sub inc_recursion {
     my $recursion = $object->header( $INT_HEADER_PREFIX . 'recursion' );
     $object->header_set( $INT_HEADER_PREFIX . 'recursion', ++$recursion );
+}
+
+sub create ($;$) {
+    my ( $type, $param ) = @_;
+
+    my ($namespace, $entity) = caller =~ /^(.+)::(.+?)$/;
+
+    croak "Invalid namespace"
+        unless $namespace ne $MOD_NAMESPACE;
+
+    croak "$entity is unknown entity"
+        unless $entity ~~ ['Acton', 'Condition'];
+
+    my $class = $namespace . '::' . $entity . '::' . ucfirst lc $type;
+
+    load_class $class;
+
+    while ( my ($k, $v) = each map { $_ => eval { $class->can($_) } } qw(new run) ) {
+        croak "$$class is missing methods: $k. See documentation" unless $v;
+    }
+
+    return $class->new( $param || {} );
 }
 
 1;
