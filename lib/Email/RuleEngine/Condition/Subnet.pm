@@ -25,21 +25,26 @@ Readonly my @OPERATORS         => qw( in notin );
 Readonly my $REGEXP_IP4        => '(\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3})';
 Readonly my $REGEXP_IP6        => "($IPv6_re)";
 
-sub new {
-    my ( $class, %param ) = @_;
+sub new ($$) {
+    my ( $class, $param ) = @_;
 
-    my $self = {};
+    croak "Operator is missed"
+        unless $param->{op};
+    croak "Operator '$param->{op}' has invalid"
+        unless any { $_ eq $param->{op} } @OPERATORS;
 
-    $self->{'coincides'} = $param{'coincides'} || 'any';
+    my $self = {
+        op        => $param->{op},
+        coincides => $param->{coincides} || 'any'
+    };
 
     return bless $self, $class;
 }
 
 sub run {
-    my ( $self, $op, @expr ) = @_;
+    my ( $self, @expr ) = @_;
 
     my $success = try {
-        croak "Operator '$op' has invalid" unless any { $_ eq $op } @OPERATORS;
         croak "Invalid number of operands" if scalar @expr != $STRONG_LIMIT_ARGS;
         1;
     }
@@ -50,7 +55,7 @@ sub run {
 
     return 0 unless $success;
 
-    my $negot = $op eq 'in' ? '!!' : '!';
+    my $negot = $self->{op} eq 'in' ? '!!' : '!';
 
     my ( @addr, @subnet );
     foreach my $field ( @expr ) {
@@ -104,9 +109,9 @@ sub run {
 
     my $matcher = subnet_matcher @subnet;
 
-    my $result = $self->{'coincides'} eq 'all' ? 1 : 0;
+    my $result = $self->{coincides} eq 'all' ? 1 : 0;
     foreach my $item ( @addr ) {
-        if ( $self->{'coincides'} eq 'all' ) {
+        if ( $self->{coincides} eq 'all' ) {
             $result &= $matcher->( $item );
         }
         else {

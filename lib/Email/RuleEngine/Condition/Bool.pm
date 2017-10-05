@@ -19,16 +19,25 @@ use Email::RuleEngine::Base qw( get_header update_chain );
 Readonly my $MIN_LIMIT_ARGS => 1;
 Readonly my @OPERATORS      => qw( && || ! ^ );
 
-sub new {
-    my ( $class ) = @_;
-    return bless {}, $class;
+sub new ($$) {
+    my ( $class, $param ) = @_;
+
+    croak "Operator is missed"
+        unless $param->{op};
+    croak "Operator '$param->{op}' has invalid"
+        unless any { $_ eq $param->{op} } @OPERATORS;
+
+    my $self = {
+        op => $param->{op}
+    };
+
+    return bless $self, $class;
 }
 
 sub run {
-    my ( $self, $op, @expr ) = @_;
+    my ( $self, @expr ) = @_;
 
     my $success = try {
-        croak "Operator '$op' has invalid" unless any { $_ eq $op } @OPERATORS;
         croak "Invalid number of operands" if scalar @expr < $MIN_LIMIT_ARGS;
         1;
     }
@@ -60,8 +69,8 @@ sub run {
 
     return 0 if scalar @fields < $MIN_LIMIT_ARGS;
 
-    return 0 + eval "$op $fields[0]" if $op eq '!'; # special case
-    return 0 + eval join " $op ", @fields;
+    return 0 + eval "$self->{op} $fields[0]" if $op eq '!'; # special case
+    return 0 + eval join " $self->{op} ", @fields;
 }
 
 1;

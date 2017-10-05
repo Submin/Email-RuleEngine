@@ -21,23 +21,29 @@ Readonly my $STRONG_LIMIT_ARGS => 2;
 Readonly my @STR_OPERATORS     => qw( eq ne lt gt le le );
 Readonly my @NUM_OPERATORS     => qw( == != < > <= => );
 
-sub new {
-    my ( $class ) = @_;
-    return bless {}, $class;
+sub new ($$) {
+    my ( $class, $param ) = @_;
+
+    croak "Condition operator is required"
+        unless $param->{op};
+
+    my $str_cmp = any { $_ eq $param->{op} } @STR_OPERATORS;
+    my $num_cmp = any { $_ eq $param->{op} } @NUM_OPERATORS;
+
+    croak "Operator '$param->{op}' has invalid"
+        unless $str_cmp || $num_cmp;
+
+    my $self = {
+        op => $param->{op}
+    };
+
+    return bless $self, $class;
 }
 
 sub run {
-    my ( $self, $op, @expr ) = @_;
-
-    my ( $str_cmp, $num_cmp );
+    my ( $self, @expr ) = @_;
 
     my $success = try {
-        croak "Condition operator is required" unless $op;
-
-        $str_cmp = any { $_ eq $op } @STR_OPERATORS;
-        $num_cmp = any { $_ eq $op } @NUM_OPERATORS;
-
-        croak "Operator '$op' has invalid" unless $str_cmp || $num_cmp;
         croak "Invalid number of operands" if scalar @expr != $STRONG_LIMIT_ARGS;
         1;
     }
@@ -63,7 +69,7 @@ sub run {
     }
 
     return 0 if scalar( grep { defined $_ } @fields ) != $STRONG_LIMIT_ARGS;
-    return 0 + eval join " $op ", @fields;
+    return 0 + eval join " $self->{op} ", @fields;
 }
 
 1;

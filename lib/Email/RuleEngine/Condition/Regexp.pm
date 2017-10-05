@@ -21,15 +21,24 @@ Readonly my $STRONG_LIMIT_ARGS  => 2;
 Readonly my @OPERATORS          => qw( !~ =~ );
 
 sub new {
-    my ( $class ) = @_;
-    return bless {}, $class;
+    my ( $class, $param ) = @_;
+
+    croak "Operator is missed"
+        unless $param->{op};
+    croak "Operator '$param->{op}' has invalid"
+        unless any { $_ eq $param->{op} } @OPERATORS;
+
+    my $self = {
+        op => $param->{op}
+    };
+
+    return bless $self, $class;
 }
 
 sub run {
-    my ( $self, $op, @expr ) = @_;
+    my ( $self, @expr ) = @_;
 
     my $success = try {
-        croak "Operator '$op' has invalid" unless any { $_ eq $op } @OPERATORS;
         croak "Invalid number of operands" if scalar @expr != $STRONG_LIMIT_ARGS;
         1;
     }
@@ -53,7 +62,7 @@ sub run {
 
     return 0 unless defined $subject && defined $regexp;
 
-    return 0 + eval "'$subject' $op m/${regexp}/smxa";
+    return 0 + eval "'$subject' $self->{op} m/${regexp}/smxa";
 }
 
 1;

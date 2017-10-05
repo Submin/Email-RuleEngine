@@ -21,21 +21,26 @@ use Email::RuleEngine::Base qw( get_header update_chain );
 Readonly my $STRONG_LIMIT_ARGS => 2;
 Readonly my @OPERATORS         => qw( in notin );
 
-sub new {
-    my ( $class, %param ) = @_;
+sub new ($$) {
+    my ( $class, $param ) = @_;
 
-    my $self = {};
+    croak "Operator is missed"
+        unless $param->{op};
+    croak "Operator '$param->{op}' has invalid"
+        unless any { $_ eq $param->{op} } @OPERATORS;
 
-    $self->{'coincides'} = $param{'coincides'} || 'any';
+    my $self = {
+        coincides => $param->{coincides} || 'any',
+        op        => $param->{op}
+    };
 
     return bless $self, $class;
 }
 
 sub run {
-    my ( $self, $op, @expr ) = @_;
+    my ( $self, @expr ) = @_;
 
     my $success = try {
-        croak "Operator '$op' has invalid" unless any { $_ eq $op } @OPERATORS;
         croak "Invalid number of operands" if scalar @expr != $STRONG_LIMIT_ARGS;
         1
     }
@@ -46,7 +51,7 @@ sub run {
 
     return 0 unless $success;
 
-    my $negot = $op eq 'in' ? '!!' : '!';
+    my $negot = $self->{op} eq 'in' ? '!!' : '!';
 
     my ( @sub_list, @list );
     foreach my $field ( @expr ) {
@@ -85,10 +90,10 @@ sub run {
 
     return 0 unless scalar @sub_list && scalar @list;
 
-    my $result = $self->{'coincides'} eq 'all' ? 1 : 0;
+    my $result = $self->{coincides} eq 'all' ? 1 : 0;
     my %elems = map { $_ => 1 } @list;
     foreach my $item ( @sub_list ) {
-        if ( $self->{'coincides'} eq 'all' ) {
+        if ( $self->{coincides} eq 'all' ) {
             $result &= $elems{ $item } || 0;
         }
         else {
